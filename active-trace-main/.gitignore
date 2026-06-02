@@ -11,3 +11,10 @@ Thumbs.db
 .DS_Store
 .vscode/
 .idea/
+
+node_modules
+.env
+.agent
+.engram
+
+__pycache__/

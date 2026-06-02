@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "activia-trace-backend"
+version = "0.1.0"
+description = "Academic traceability platform - backend API."
+authors = [{ name = "Activia Trace Team" }]
+license = { text = "MIT" }
+requires-python = ">=3.13,<4.0"
+dependencies = [
+    "fastapi>=0.108.0",
+    "uvicorn[standard]>=0.25.0",
+    "sqlalchemy>=2.0.23",
+    "alembic>=1.13.1",
+    "asyncpg>=0.29.0",
+    "pydantic>=2.4.0",
+    "pydantic-settings>=2.0.3",
+    "argon2-cffi>=23.1.0",
+    "python-jose[cryptography]>=3.3.0",
+    "opentelemetry-instrumentation-fastapi>=0.43b0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.23.0",
+    "httpx>=0.25.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["app"]
+include = ["*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+asyncio_mode = "auto"
+
