@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from sqlalchemy.orm import declarative_base
 from app.core.config import Settings
+from app.models.base import Base
 
 # Force config load to get env vars
 settings = Settings()
@@ -17,4 +17,5 @@ SessionLocal = async_sessionmaker(
     expire_on_commit=False
 )
 
-Base = declarative_base()
+# Base is imported from models.base for consistency
+__all__ = ['engine', 'SessionLocal', 'AsyncSession', 'Base']
