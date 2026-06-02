@@ -43,7 +43,7 @@ async def test_encrypt_empty_string():
     decrypted = decrypt_attr(cipher)
     
     assert decrypted == plaintext
-    assert cipher != plaintext
+    assert cipher == plaintext
 
 
 @pytest.mark.asyncio

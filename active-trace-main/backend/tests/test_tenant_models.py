@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import select
 from app.models.base import TimestampedTenant
 from app.models.tenant import Tenant
-from app.core.database import Base, get_session
+from app.core.database import Base
 
 
 @pytest.mark.asyncio

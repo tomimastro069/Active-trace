@@ -18,7 +18,7 @@ async def test_health_endpoint_up(monkeypatch):
     app.dependency_overrides[get_db] = lambda: mock_db
     
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.get("/health")
+        response = await ac.get("/api/v1/health")
         
     assert response.status_code == 200
     data = response.json()
@@ -43,7 +43,7 @@ async def test_health_endpoint_down(monkeypatch):
     app.dependency_overrides[get_db] = lambda: mock_db
     
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.get("/health")
+        response = await ac.get("/api/v1/health")
         
     assert response.status_code == 200
     data = response.json()

@@ -6,9 +6,13 @@ from app.repositories.permiso import PermisoRepository
 from app.repositories.rol_permiso import RolPermisoRepository
 from app.repositories.asignacion import AsignacionRepository
 from app.repositories.audit_log import AuditLogRepository
+from app.repositories.carrera import CarreraRepository
+from app.repositories.materia import MateriaRepository
+from app.repositories.cohorte import CohorteRepository
 
 __all__ = [
     'BaseRepository', 'UsuarioRepository', 'TokenRefrescoRepository',
     'RolRepository', 'PermisoRepository', 'RolPermisoRepository',
-    'AsignacionRepository', 'AuditLogRepository'
+    'AsignacionRepository', 'AuditLogRepository',
+    'CarreraRepository', 'MateriaRepository', 'CohorteRepository'
 ]
