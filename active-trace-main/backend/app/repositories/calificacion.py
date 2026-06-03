@@ -118,3 +118,42 @@ class CalificacionRepository(BaseRepository[Calificacion]):
         query = self._apply_tenant_scope(query)
         result = await self.session.execute(query)
         return result.scalars().all()
+
+    async def get_distinct_activities(
+        self,
+        materia_id: UUID,
+        docente_id: Optional[UUID] = None
+    ) -> List[str]:
+        """
+        Retrieves unique active activity names for a subject, optionally filtered by teacher.
+        """
+        query = select(self.model.actividad).where(self.model.materia_id == materia_id)
+        if docente_id:
+            query = query.where(self.model.docente_id == docente_id)
+        query = self._apply_tenant_scope(query)
+        query = query.distinct()
+        result = await self.session.execute(query)
+        return list(result.scalars().all())
+
+    async def get_ungraded_textual_calificaciones(
+        self,
+        materia_id: UUID,
+        docente_id: Optional[UUID] = None
+    ) -> List[Calificacion]:
+        """
+        Gets all qualifications where finalizado == True, nota_numerica is null,
+        nota_textual is null, and es_numerica == False (ungraded TPs).
+        """
+        query = select(self.model).where(
+            self.model.materia_id == materia_id,
+            self.model.finalizado == True,
+            self.model.nota_numerica.is_(None),
+            self.model.nota_textual.is_(None),
+            self.model.es_numerica == False
+        )
+        if docente_id:
+            query = query.where(self.model.docente_id == docente_id)
+        query = self._apply_tenant_scope(query)
+        result = await self.session.execute(query)
+        return list(result.scalars().all())
+

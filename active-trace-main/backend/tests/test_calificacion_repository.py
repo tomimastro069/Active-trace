@@ -165,3 +165,94 @@ async def test_calificacion_repository_operations(db_session):
     grades_b = await repo.get_calificaciones_by_materia(materia.id, docente_b_id)
     assert len(grades_b) == 1
     assert grades_b[0].nota_numerica == 10.0
+
+
+@pytest.mark.asyncio
+async def test_new_calificacion_repository_helpers(db_session):
+    tenant_id = uuid.uuid4()
+    docente_id = uuid.uuid4()
+    student_id = uuid.uuid4()
+
+    tenant = Tenant(id=tenant_id, name="Test Helpers Tenant")
+    docente = Usuario(id=docente_id, tenant_id=tenant_id, email="helpers_doc@example.com", hashed_password="pwd")
+    student = Usuario(id=student_id, tenant_id=tenant_id, email="helpers_stu@example.com", hashed_password="pwd")
+    carrera = Carrera(id=uuid.uuid4(), tenant_id=tenant_id, codigo="ISI", nombre="Sistemas", estado="Activa")
+    
+    db_session.add_all([tenant, docente, student, carrera])
+    await db_session.commit()
+
+    cohorte = Cohorte(
+        id=uuid.uuid4(),
+        tenant_id=tenant_id,
+        carrera_id=carrera.id,
+        nombre="Cohorte 2026",
+        anio=2026,
+        vig_desde=datetime.utcnow().date(),
+        estado="Activa"
+    )
+    materia = Materia(
+        id=uuid.uuid4(),
+        tenant_id=tenant_id,
+        codigo="AED",
+        nombre="Algoritmos",
+        estado="Activa"
+    )
+    db_session.add_all([cohorte, materia])
+    await db_session.commit()
+
+    version_padron = VersionPadron(
+        tenant_id=tenant_id,
+        materia_id=materia.id,
+        cohorte_id=cohorte.id,
+        activa=True
+    )
+    db_session.add(version_padron)
+    await db_session.commit()
+
+    entrada = EntradaPadron(
+        tenant_id=tenant_id,
+        version_id=version_padron.id,
+        usuario_id=student_id,
+        email="helpers_stu@example.com",
+        nombre="Juan",
+        apellidos="Perez"
+    )
+    db_session.add(entrada)
+    await db_session.commit()
+
+    repo = CalificacionRepository(db_session, tenant_id)
+
+    # Insert qualitative ungraded qualification (finalizado=True, nota_numerica=None, nota_textual=None, es_numerica=False)
+    grades_data = [
+        {
+            "entrada_padron_id": entrada.id,
+            "actividad": "TP_Ungraded",
+            "nota_numerica": None,
+            "nota_textual": None,
+            "aprobado": False,
+            "finalizado": True,
+            "es_numerica": False,
+            "origen": "Importado"
+        },
+        {
+            "entrada_padron_id": entrada.id,
+            "actividad": "TP_Graded_Num",
+            "nota_numerica": 8.0,
+            "nota_textual": None,
+            "aprobado": True,
+            "finalizado": True,
+            "es_numerica": True,
+            "origen": "Importado"
+        }
+    ]
+    await repo.bulk_upsert_calificaciones(materia.id, docente_id, grades_data)
+
+    # 1. Test get_distinct_activities
+    activities = await repo.get_distinct_activities(materia.id, docente_id)
+    assert set(activities) == {"TP_Ungraded", "TP_Graded_Num"}
+
+    # 2. Test get_ungraded_textual_calificaciones
+    ungraded = await repo.get_ungraded_textual_calificaciones(materia.id, docente_id)
+    assert len(ungraded) == 1
+    assert ungraded[0].actividad == "TP_Ungraded"
+
