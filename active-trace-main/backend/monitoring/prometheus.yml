@@ -1,0 +1,7 @@
+# Example Prometheus config. Adjust 'targets' as needed for your environment.
+
+scrape_configs:
+  - job_name: 'fastapi-app'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['localhost:8000']

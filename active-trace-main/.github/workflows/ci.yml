@@ -1,0 +1,178 @@
+# CI unificado para activia-trace (Fase 3)
+name: CI
+
+on:
+  push:
+    branches: [ "main", "develop", "release/*" ]
+  pull_request:
+    branches: [ "main", "develop", "release/*" ]
+
+jobs:
+  # ---- TESTS ----
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run pytest
+        run: pytest --maxfail=1 --disable-warnings --tb=short
+      - name: Tests OK marker
+        if: success()
+        run: echo "✅ Pytest successful"
+
+  # ---- LINT ----
+  lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8
+      - name: Run flake8
+        run: flake8 . --count --show-source --max-line-length=120 --statistics
+      - name: Lint OK marker
+        if: success()
+        run: echo "✅ Lint passed"
+
+  # ---- MÉTRICAS (Prometheus rules/coverage) ----
+  metrics-check:
+    runs-on: ubuntu-latest
+    needs: test
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Instalar dependencias (metrics)
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest-cov
+      - name: Ejecutar cobertura
+        run: pytest --cov=app --cov-report=xml
+      - name: Analizar cobertura
+        run: |
+          python3 -c "with open('coverage.xml') as f: import sys; xml = f.read(); pct = float(xml.split('line-rate=\"')[1].split('\"')[0])*100; print(f'Cobertura: {pct:.1f}%'); exit(0 if pct >= 80 else 1)"
+      - name: Cobertura suficiente
+        if: success()
+        run: echo "✅ Cobertura OK"
+      - name: Cobertura insuficiente
+        if: failure()
+        run: echo "❌ Cobertura de tests <80%."
+
+  # ---- NOTIFY ON FAILURE ----
+  notify-failure:
+    runs-on: ubuntu-latest
+    needs: [test, lint, metrics-check]
+    if: failure()
+    permissions:
+      issues: write
+    steps:
+      - name: Create failure issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const title = `🔴 CI failed on ${context.ref} (${context.sha.substring(0, 7)})`;
+            const body = [
+              `## CI Pipeline Failure`,
+              ``,
+              `| Field | Value |`,
+              `|-------|-------|`,
+              `| **Branch** | \`${context.ref}\` |`,
+              `| **Commit** | \`${context.sha.substring(0, 7)}\` |`,
+              `| **Actor** | @${context.actor} |`,
+              `| **Run** | [View logs](${runUrl}) |`,
+              ``,
+              `One or more CI jobs failed. Check the run logs for details.`,
+            ].join('\n');
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: ['ci-failure', 'automated']
+            });
+
+  # ---- DEPLOY ----
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [test, lint, metrics-check]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Instalar dependencias
+        run: |
+          pip install --upgrade pip
+          pip install -r backend/requirements.txt
+      - name: TODO - Step de despliegue real (Easypanel)
+        id: deploy-step
+        run: |
+          echo "Desplegar imagen/producto en infra :: manual"
+          # TODO: Integrar con pipeline real de despliegue (Easypanel)
+
+  # ---- ROLLBACK ON DEPLOY FAILURE ----
+  rollback:
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: failure()
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Revert to previous commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git revert --no-edit HEAD
+          git push origin main
+      - name: Create rollback issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔄 Auto-rollback triggered on main (${context.sha.substring(0, 7)})`,
+              body: `Deploy failed. Automatic revert was pushed to main.\n\n[View failed run](${runUrl})`,
+              labels: ['rollback', 'ci-failure', 'automated']
+            });
