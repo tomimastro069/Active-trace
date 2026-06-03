@@ -9,10 +9,12 @@ from app.repositories.audit_log import AuditLogRepository
 from app.repositories.carrera import CarreraRepository
 from app.repositories.materia import MateriaRepository
 from app.repositories.cohorte import CohorteRepository
+from app.repositories.padron_repository import PadronRepository
 
 __all__ = [
     'BaseRepository', 'UsuarioRepository', 'TokenRefrescoRepository',
     'RolRepository', 'PermisoRepository', 'RolPermisoRepository',
     'AsignacionRepository', 'AuditLogRepository',
-    'CarreraRepository', 'MateriaRepository', 'CohorteRepository'
+    'CarreraRepository', 'MateriaRepository', 'CohorteRepository',
+    'PadronRepository'
 ]

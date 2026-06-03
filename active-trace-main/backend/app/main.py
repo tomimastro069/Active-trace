@@ -10,6 +10,7 @@ from app.api.v1.routers.cohortes import router as cohortes_router
 from app.api.v1.routers.usuarios import router as usuarios_router
 from app.api.v1.routers.asignaciones import router as asignaciones_router
 from app.api.v1.routers.equipos import router as equipos_router
+from app.api.v1.routers.padron import router as padron_router
 from app.core.database import engine
 
 # Initialize logging at startup
@@ -38,4 +39,5 @@ app.include_router(cohortes_router, prefix="/api/v1")
 app.include_router(usuarios_router, prefix="/api/v1")
 app.include_router(asignaciones_router, prefix="/api/v1")
 app.include_router(equipos_router, prefix="/api/v1")
+app.include_router(padron_router, prefix="/api/v1")
 
