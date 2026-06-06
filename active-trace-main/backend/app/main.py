@@ -17,6 +17,7 @@ from app.api.v1.routers.analisis import router as analisis_router
 from app.api.v1.routers.comunicaciones import router as comunicaciones_router
 from app.api.v1.routers.encuentros import router as encuentros_router
 from app.api.v1.routers.guardias import router as guardias_router
+from app.api.v1.routers.evaluaciones import router as evaluaciones_router
 from app.core.database import engine
 
 # Monitoring
@@ -62,5 +63,6 @@ app.include_router(analisis_router, prefix="/api/v1")
 app.include_router(comunicaciones_router, prefix="/api/v1")
 app.include_router(encuentros_router, prefix="/api/v1")
 app.include_router(guardias_router, prefix="/api/v1")
+app.include_router(evaluaciones_router, prefix="/api/v1")
 
 
