@@ -17,6 +17,7 @@ from app.models.comunicacion import Comunicacion, EstadoComunicacion
 from app.models.encuentro import SlotEncuentro, InstanciaEncuentro, DiaSemanaEnum, EstadoEncuentroEnum
 from app.models.guardia import Guardia, EstadoGuardiaEnum
 from app.models.evaluacion import Evaluacion, ReservaEvaluacion, ResultadoEvaluacion, EvaluacionTipoEnum, EstadoReservaEnum
+from app.models.aviso import Aviso, AcknowledgmentAviso, AlcanceEnum
 
 __all__ = [
     'TimestampedTenant', 'Base', 'Tenant', 'Usuario', 'TokenRefresco',
@@ -27,4 +28,5 @@ __all__ = [
     'SlotEncuentro', 'InstanciaEncuentro', 'DiaSemanaEnum', 'EstadoEncuentroEnum',
     'Guardia', 'EstadoGuardiaEnum',
     'Evaluacion', 'ReservaEvaluacion', 'ResultadoEvaluacion', 'EvaluacionTipoEnum', 'EstadoReservaEnum',
+    'Aviso', 'AcknowledgmentAviso', 'AlcanceEnum',
 ]
