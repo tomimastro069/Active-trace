@@ -6,6 +6,10 @@ import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { Layout } from '@/shared/components/Layout';
 import { ComisionDashboard } from '@/features/academico-docente/pages/ComisionDashboard';
 import { MonitorSeguimientoPage } from '@/features/academico-docente/pages/MonitorSeguimientoPage';
+import { EquiposPage } from '@/features/coordinacion/pages/EquiposPage';
+import { AvisosPage } from '@/features/coordinacion/pages/AvisosPage';
+import { TareasPage } from '@/features/coordinacion/pages/TareasPage';
+import { MonitorCoordinacionPage } from '@/features/coordinacion/pages/MonitorCoordinacionPage';
 import './index.css';
 
 const DashboardPlaceholder = () => (
@@ -46,6 +50,10 @@ function App() {
                 <Route path="/comisiones" element={<ComisionesListPlaceholder />} />
                 <Route path="/comisiones/:materiaId/:cohorteId" element={<ComisionDashboard />} />
                 <Route path="/monitor-seguimiento" element={<MonitorSeguimientoPage />} />
+                <Route path="/equipos" element={<EquiposPage />} />
+                <Route path="/avisos" element={<AvisosPage />} />
+                <Route path="/tareas" element={<TareasPage />} />
+                <Route path="/monitor-coordinacion" element={<MonitorCoordinacionPage />} />
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
               </Route>
             </Route>

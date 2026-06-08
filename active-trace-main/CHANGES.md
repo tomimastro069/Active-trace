@@ -496,7 +496,7 @@ C-01 → C-02 → C-03 → C-04 → C-06 → C-07 → C-09 → C-10 → C-11 →
   - `knowledge-base/07_flujos_principales.md` FL-02, FL-04
 
 ### [C-23] `frontend-coordinacion`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado
 - **Scope**:
   - Features de COORDINADOR/ADMIN: gestión de equipos docentes (mis-equipos, masiva, clonar, vigencia, export), avisos (ABM + scope + ack), tareas internas (workflow), monitores transversales (general F2.7, F2.9), encuentros admin, coloquios.
   - Setup de cuatrimestre (FL-03). Consume `C-08`, `C-13`, `C-14`, `C-15`, `C-16`, `C-17`.
@@ -543,4 +543,8 @@ Se implementó el módulo de auditoría `AuditLog` inmutable (append-only vía t
 ## C-20 Perfil y Mensajería Interna
 **Status:** COMPLETO y ARCHIVADO
 Se implementó la edición de perfil propio (F11.1), incluyendo datos fiscales, bancarios, modalidad de cobro y regional, asegurando que el CUIL sea de solo lectura. Además, se desarrolló la bandeja de mensajes interna (F3.4, F11.2, FL-10) para la mensajería interna entre usuarios registrados, con hilos de respuestas y aislamiento por tenant.
+
+## C-23 Frontend Coordinación
+**Status:** COMPLETO y ARCHIVADO
+Se implementó la capa de presentación React para COORDINADOR/ADMIN bajo `frontend/src/features/coordinacion/`: gestión de equipos docentes (mis-equipos, clonado entre períodos, export CSV), ABM de avisos con selector de alcance y acknowledgment, flujo de tareas internas (board por estado, delegación, comentarios en hilo) y monitor transversal de coordinación (F2.7, F2.9). Consume los backends de C-08, C-15, C-16 y C-11 vía servicios Axios tipados sobre el cliente compartido con refresh transparente; navegación gated por rol en el `Layout`. Verificado con Vitest (9 archivos / 28 tests) y `tsc --noEmit` limpio.
 

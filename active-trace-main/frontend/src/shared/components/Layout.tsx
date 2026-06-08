@@ -35,6 +35,24 @@ export const Layout = () => {
               </Link>
             </>
           )}
+
+          {(user?.roles?.includes('COORDINADOR') || user?.roles?.includes('ADMIN')) && (
+            <>
+              <div className="text-xs uppercase text-slate-500 font-semibold mb-2 mt-6">Coordinación</div>
+              <Link to="/equipos" className="block px-4 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+                Equipos Docentes
+              </Link>
+              <Link to="/avisos" className="block px-4 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+                Avisos
+              </Link>
+              <Link to="/tareas" className="block px-4 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+                Tareas Internas
+              </Link>
+              <Link to="/monitor-coordinacion" className="block px-4 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+                Monitor Coordinación
+              </Link>
+            </>
+          )}
         </nav>
 
         <div className="p-4 border-t border-slate-800">
