@@ -1,0 +1,60 @@
+import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+
+export const Layout = () => {
+  const { user, logoutUser } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logoutUser();
+    navigate('/login');
+  };
+
+  return (
+    <div className="flex h-screen bg-gray-50">
+      {/* Sidebar */}
+      <aside className="w-64 bg-slate-900 text-white flex flex-col">
+        <div className="p-4 border-b border-slate-800">
+          <h2 className="text-xl font-bold tracking-tight">ActiveTrace</h2>
+        </div>
+        
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          <div className="text-xs uppercase text-slate-500 font-semibold mb-2 mt-4">General</div>
+          <Link to="/dashboard" className="block px-4 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+            Dashboard
+          </Link>
+          
+          {(user?.roles?.includes('PROFESOR') || user?.roles?.includes('TUTOR')) && (
+            <>
+              <div className="text-xs uppercase text-slate-500 font-semibold mb-2 mt-6">Académico Docente</div>
+              <Link to="/comisiones" className="block px-4 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+                Mis Comisiones
+              </Link>
+              <Link to="/monitor-seguimiento" className="block px-4 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+                Monitor Seguimiento
+              </Link>
+            </>
+          )}
+        </nav>
+
+        <div className="p-4 border-t border-slate-800">
+          <div className="mb-2">
+            <p className="text-sm font-medium">{user?.email}</p>
+            <p className="text-xs text-slate-400">{user?.roles?.join(', ')}</p>
+          </div>
+          <button 
+            onClick={handleLogout}
+            className="w-full mt-2 text-sm text-center py-2 border border-slate-700 rounded hover:bg-slate-800 transition-colors"
+          >
+            Cerrar Sesión
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto bg-white shadow-inner">
+        <Outlet />
+      </main>
+    </div>
+  );
+};

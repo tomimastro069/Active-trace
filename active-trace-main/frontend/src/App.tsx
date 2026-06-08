@@ -3,12 +3,22 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/shared/contexts/AuthContext';
 import { AuthGuard } from '@/shared/components/AuthGuard';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
+import { Layout } from '@/shared/components/Layout';
+import { ComisionDashboard } from '@/features/academico-docente/pages/ComisionDashboard';
+import { MonitorSeguimientoPage } from '@/features/academico-docente/pages/MonitorSeguimientoPage';
 import './index.css';
 
 const DashboardPlaceholder = () => (
   <div className="p-8">
     <h1 className="text-3xl font-bold">Dashboard (Protegido)</h1>
     <p className="mt-4 text-gray-600">Bienvenido al sistema.</p>
+  </div>
+);
+
+const ComisionesListPlaceholder = () => (
+  <div className="p-8">
+    <h1 className="text-3xl font-bold">Mis Comisiones</h1>
+    <p className="mt-4 text-gray-600">Seleccione una comisión (Demo: /comisiones/1/1).</p>
   </div>
 );
 
@@ -29,10 +39,15 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/unauthorized" element={<UnauthorizedPlaceholder />} />
             
-            {/* Rutas Privadas protegidas por AuthGuard */}
+            {/* Rutas Privadas protegidas por AuthGuard y envueltas en Layout */}
             <Route element={<AuthGuard />}>
-              <Route path="/dashboard" element={<DashboardPlaceholder />} />
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route element={<Layout />}>
+                <Route path="/dashboard" element={<DashboardPlaceholder />} />
+                <Route path="/comisiones" element={<ComisionesListPlaceholder />} />
+                <Route path="/comisiones/:materiaId/:cohorteId" element={<ComisionDashboard />} />
+                <Route path="/monitor-seguimiento" element={<MonitorSeguimientoPage />} />
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              </Route>
             </Route>
             
             {/* Catch-all fallback */}
