@@ -448,7 +448,7 @@ C-01 → C-02 → C-03 → C-04 → C-06 → C-07 → C-09 → C-10 → C-11 →
   - `knowledge-base/04_modelo_de_datos.md` §E-AUD
 
 ### [C-20] `perfil-y-mensajeria-interna`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado
 - **Scope**:
   - Editar perfil propio (F11.1): nombre, datos fiscales/bancarios, regional, modalidad de cobro; CUIL solo lectura.
   - Bandeja de mensajes interna (F3.4, F11.2, FL-10): hilos recibidos, responder dentro del hilo. Mensajería entre usuarios registrados (paralela a comunicaciones a alumnos).
@@ -539,3 +539,8 @@ Para arrancar: `/opsx:propose C-01-foundation-setup`
 ## C-05 Audit Log & Impersonación
 **Status:** COMPLETO y ARCHIVADO
 Se implementó el módulo de auditoría `AuditLog` inmutable (append-only vía trigger DB) y el endpoint de impersonación. El JWT soporta token dual (impersonated_sub) y la dependencia `get_current_user` inyecta en el state los roles e IDs transparentemente, sin modificar la lógica de negocio.
+
+## C-20 Perfil y Mensajería Interna
+**Status:** COMPLETO y ARCHIVADO
+Se implementó la edición de perfil propio (F11.1), incluyendo datos fiscales, bancarios, modalidad de cobro y regional, asegurando que el CUIL sea de solo lectura. Además, se desarrolló la bandeja de mensajes interna (F3.4, F11.2, FL-10) para la mensajería interna entre usuarios registrados, con hilos de respuestas y aislamiento por tenant.
+

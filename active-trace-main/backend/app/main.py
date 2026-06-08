@@ -69,8 +69,8 @@ app.include_router(guardias_router, prefix="/api/v1")
 app.include_router(evaluaciones_router, prefix="/api/v1")
 app.include_router(avisos_router, prefix="/api/v1/avisos")
 from app.api.v1.routers.tareas import router as tareas_router
+from app.api.v1.routers.auditoria import router as auditoria_router
 app.include_router(tareas_router, prefix="/api/v1/tareas")
 app.include_router(perfil_router, prefix="/api/v1")
 app.include_router(inbox_router, prefix="/api/v1")
-
-
+app.include_router(auditoria_router, prefix="/api/v1/auditoria")

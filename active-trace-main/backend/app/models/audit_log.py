@@ -43,7 +43,8 @@ class AuditLog(Base):
 
     materia_id = Column(
         SQLAlchemyUUID(as_uuid=True),
-        nullable=True  # No FK constraint yet because Materia is C-06
+        ForeignKey('materias.id', ondelete='SET NULL'),
+        nullable=True
     )
 
     accion = Column(

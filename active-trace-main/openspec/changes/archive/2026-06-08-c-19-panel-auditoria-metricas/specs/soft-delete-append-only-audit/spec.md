@@ -1,7 +1,11 @@
-## ADDED Requirements
+# Delta for soft-delete-append-only-audit
+
+## MODIFIED Requirements
 
 ### Requirement: Soft delete append-only pattern
+
 The system SHALL never perform hard deletes (DELETE SQL command) on any domain model. All deletes SHALL mark `deleted_at` timestamp. Queries by default SHALL exclude soft-deleted records. The soft-delete pattern enables append-only audit logging: all changes (creation, modification, deletion) are recorded, and the audit log records the event with actor, timestamp, and optional academic subject reference (`materia_id` referencing `materias.id`).
+(Previously: The system never performs hard deletes, all deletes mark deleted_at, default queries exclude soft-deleted records, and actions are logged.)
 
 #### Scenario: Logical delete marks timestamp, preserves data
 - **WHEN** a record is deleted via the application (e.g., `repository.delete_logical(id)`)
