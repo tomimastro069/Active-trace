@@ -13,6 +13,15 @@ from app.core.dependencies import get_current_user, require_permission
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+@router.get("/me", response_model=CurrentUser)
+async def me(current_user: CurrentUser = Depends(get_current_user)):
+    """
+    Devuelve la identidad de la sesión actual, resuelta exclusivamente del JWT
+    verificado (regla de oro). El frontend la usa tras el login y para restaurar
+    la sesión al recargar la página.
+    """
+    return current_user
+
 @router.post("/login", response_model=Token)
 async def login(request_payload: LoginRequest, request: Request, db: AsyncSession = Depends(get_db)):
     """

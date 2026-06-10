@@ -225,3 +225,43 @@ async def test_2fa_full_lifecycle(db_session):
         assert final_tokens["requires_2fa"] is False
 
     app.dependency_overrides.clear()
+
+@pytest.mark.asyncio
+async def test_me_endpoint(db_session):
+    tenant_id = uuid.uuid4()
+    password = "secure_password_123"
+    user = Usuario(
+        tenant_id=tenant_id,
+        email="test_me@example.com",
+        hashed_password=hash_password(password),
+        estado="Activo"
+    )
+    db_session.add(user)
+    await db_session.commit()
+
+    app.dependency_overrides[get_db] = lambda: db_session
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        # Sin token -> 401 (fail-closed)
+        res_anon = await ac.get("/api/v1/auth/me")
+        assert res_anon.status_code == 401
+
+        res_login = await ac.post(
+            "/api/v1/auth/login",
+            json={"email": "test_me@example.com", "password": password},
+        )
+        assert res_login.status_code == 200
+        access_token = res_login.json()["access_token"]
+
+        res_me = await ac.get(
+            "/api/v1/auth/me",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+        assert res_me.status_code == 200
+        body = res_me.json()
+        assert body["email"] == "test_me@example.com"
+        assert body["tenant_id"] == str(tenant_id)
+        assert body["id"] == str(user.id)
+        assert isinstance(body["roles"], list)
+
+    app.dependency_overrides.clear()
