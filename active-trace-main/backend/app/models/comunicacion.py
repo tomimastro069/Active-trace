@@ -76,7 +76,14 @@ class Comunicacion(Base, TimestampedTenant):
     )
 
     estado = Column(
-        SAEnum(EstadoComunicacion, name="estadocomunicacion"),
+        # values_callable: la migración crea el tipo con los VALORES del dominio
+        # ("Pendiente", "Enviando", ...); sin esto SQLAlchemy envía los nombres
+        # de los miembros ("PENDIENTE") y Postgres rechaza el bind.
+        SAEnum(
+            EstadoComunicacion,
+            name="estadocomunicacion",
+            values_callable=lambda e: [m.value for m in e],
+        ),
         nullable=False,
         default=EstadoComunicacion.PENDIENTE,
         doc="Estado de la maquina de estados del envio.",
