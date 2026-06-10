@@ -15,12 +15,15 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Routes that don't require tenant context
+# Routes that don't require tenant context (documented public surface)
 PUBLIC_PATHS = frozenset({
     "/health",
     "/api/v1/health",
     "/api/v1/auth/login",
     "/api/v1/auth/refresh",
+    "/api/v1/auth/verify-2fa",
+    "/api/v1/auth/forgot",
+    "/api/v1/auth/reset",
     "/metrics",
     "/docs",
     "/redoc",
@@ -36,35 +39,21 @@ PUBLIC_PREFIXES = (
 
 class TenantMiddleware(BaseHTTPMiddleware):
     """
-    Global tenant enforcement middleware.
+    Tenant context middleware (pass-through).
 
-    For authenticated routes, verifies that the JWT payload contains a valid
-    tenant_id claim. Sets request.state.tenant_id for downstream use.
+    Authentication is NOT enforced here: every protected endpoint declares
+    `get_current_user` (OAuth2PasswordBearer responds 401 on a missing or
+    invalid token) and/or `require_permission` (403 without permission).
+    Tenant enforcement happens in BaseRepository._apply_tenant_scope using
+    the tenant_id resolved from the verified JWT.
 
-    Public routes (health, metrics, auth, docs) are excluded.
+    Rejecting requests here based on raw headers duplicated that logic and
+    broke anonymous auth endpoints (forgot/reset/verify-2fa) plus every test
+    that relies on dependency_overrides. PUBLIC_PATHS documents the public
+    surface for tooling and future use.
     """
 
     async def dispatch(self, request: Request, call_next):
-        path = request.url.path.rstrip("/")
-
-        # Skip public routes
-        if path in PUBLIC_PATHS or any(path.startswith(p) for p in PUBLIC_PREFIXES):
-            return await call_next(request)
-
-        # For authenticated routes, tenant_id comes from the JWT via get_current_user.
-        # That dependency sets request.state with user info including tenant_id.
-        # Here we just ensure the header exists as a fast-fail before hitting the
-        # auth dependency, and set request.state.tenant_id for logging/context.
-        # The actual tenant enforcement happens in BaseRepository._apply_tenant_scope.
-
-        # Check Authorization header presence (fast-fail)
-        auth_header = request.headers.get("Authorization")
-        if not auth_header:
-            return JSONResponse(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                content={"detail": "Missing authentication credentials."},
-            )
-
         return await call_next(request)
 
 
