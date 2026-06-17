@@ -42,6 +42,9 @@ export const Layout = () => {
           {(user?.roles?.includes('COORDINADOR') || user?.roles?.includes('ADMIN')) && (
             <>
               <div className="text-xs uppercase text-slate-500 font-semibold mb-2 mt-6">Coordinación</div>
+              <Link to="/usuarios" className="block px-4 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+                Gestión de Usuarios
+              </Link>
               <Link to="/equipos" className="block px-4 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
                 Equipos Docentes
               </Link>

@@ -13,6 +13,7 @@ import { EquiposPage } from '@/features/coordinacion/pages/EquiposPage';
 import { AvisosPage } from '@/features/coordinacion/pages/AvisosPage';
 import { TareasPage } from '@/features/coordinacion/pages/TareasPage';
 import { MonitorCoordinacionPage } from '@/features/coordinacion/pages/MonitorCoordinacionPage';
+import { UsuariosPage } from '@/features/coordinacion/pages/UsuariosPage';
 import './index.css';
 
 
@@ -42,6 +43,7 @@ function App() {
                 <Route path="/monitor-seguimiento" element={<MonitorSeguimientoPage />} />
                 <Route path="/padron" element={<PadronPage />} />
                 <Route path="/equipos" element={<EquiposPage />} />
+                <Route path="/usuarios" element={<UsuariosPage />} />
                 <Route path="/avisos" element={<AvisosPage />} />
                 <Route path="/tareas" element={<TareasPage />} />
                 <Route path="/monitor-coordinacion" element={<MonitorCoordinacionPage />} />

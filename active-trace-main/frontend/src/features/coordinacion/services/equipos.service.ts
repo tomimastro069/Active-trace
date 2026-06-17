@@ -57,6 +57,11 @@ export const equiposService = {
     return response.data;
   },
 
+  crearUsuario: async (payload: any) => {
+    const response = await api.post<UsuarioSimple>('/admin/usuarios/', payload);
+    return response.data;
+  },
+
   crearAsignacion: async (payload: AsignacionCreatePayload) => {
     const response = await api.post<Asignacion>('/asignaciones/', payload);
     return response.data;
