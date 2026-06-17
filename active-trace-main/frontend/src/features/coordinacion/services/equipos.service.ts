@@ -53,7 +53,7 @@ export const equiposService = {
   },
 
   getRoles: async () => {
-    const response = await api.get<RolSimple[]>('/admin/usuarios/roles');
+    const response = await api.get<RolSimple[]>('/admin/usuarios/roles/list');
     return response.data;
   },
 

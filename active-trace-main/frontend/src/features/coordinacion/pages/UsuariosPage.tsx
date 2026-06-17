@@ -11,6 +11,7 @@ export const UsuariosPage = () => {
     apellidos: '',
     estado: 'Activo',
   });
+  const [selectedRole, setSelectedRole] = useState<string>('');
   const [feedback, setFeedback] = useState<string | null>(null);
 
   // Consulta de usuarios
@@ -18,12 +19,30 @@ export const UsuariosPage = () => {
     queryKey: ['admin-usuarios'],
     queryFn: equiposService.getUsuarios,
   });
+  const { data: roles, isLoading: rolesLoading } = useQuery({
+    queryKey: ['admin-roles'],
+    queryFn: equiposService.getRoles,
+  });
 
   // Mutación para la creación de usuario
   const crearUserMutation = useMutation({
-    mutationFn: () => equiposService.crearUsuario(nuevoUser),
-    onSuccess: () => {
-      setFeedback('Usuario creado exitosamente.');
+    mutationFn: (payload) => equiposService.crearUsuario(payload),
+    onSuccess: async (createdUser) => {
+      // Assign selected role to the newly created user
+      if (selectedRole) {
+        try {
+          await equiposService.crearAsignacion({
+            usuario_id: createdUser.id,
+            rol_id: selectedRole,
+            desde: new Date().toISOString(),
+          });
+          setFeedback('Usuario y asignación creados exitosamente.');
+        } catch (e) {
+          setFeedback('Usuario creado, pero falló la asignación de rol.');
+        }
+      } else {
+        setFeedback('Usuario creado exitosamente (sin rol asignado).');
+      }
       setNuevoUser({
         email: '',
         password: '',
@@ -31,8 +50,12 @@ export const UsuariosPage = () => {
         apellidos: '',
         estado: 'Activo',
       });
+      setSelectedRole('');
       queryClient.invalidateQueries({ queryKey: ['admin-usuarios'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-roles'] });
     },
+
+
     onError: () => {
       setFeedback('Error al crear el usuario. Verificá que el email no esté registrado.');
     },
@@ -40,7 +63,11 @@ export const UsuariosPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    crearUserMutation.mutate();
+    if (!selectedRole) {
+      setFeedback('Debes seleccionar un rol antes de crear el usuario.');
+      return;
+    }
+    crearUserMutation.mutate(nuevoUser);
   };
 
   return (
@@ -80,6 +107,24 @@ export const UsuariosPage = () => {
                   onChange={(e) => setNuevoUser({ ...nuevoUser, email: e.target.value })}
                   className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                 />
+                {/* Role selector */}
+                {rolesLoading ? (
+                  <select disabled className="w-full mt-2 rounded-xl border border-slate-300 px-3.5 py-2 text-sm bg-gray-100">
+                    <option>Cargando roles...</option>
+                  </select>
+                ) : (
+                  <select
+                    required
+                    value={selectedRole}
+                    onChange={(e) => setSelectedRole(e.target.value)}
+                    className="w-full mt-2 rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                  >
+                    <option value="" disabled>Seleccioná un rol</option>
+                    {roles && roles.map((rol: any) => (
+                      <option key={rol.id} value={rol.id}>{rol.nombre}</option>
+                    ))}
+                  </select>
+                )}
               </div>
 
               <div>
@@ -171,13 +216,14 @@ export const UsuariosPage = () => {
                     <tr>
                       <th className="px-6 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Nombre Completo</th>
                       <th className="px-6 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Email</th>
+                      <th className="px-6 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Rol</th>
                       <th className="px-6 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Estado</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 bg-white">
                     {usuarios.length === 0 && (
                       <tr>
-                        <td colSpan={3} className="px-6 py-10 text-center text-sm text-slate-400">
+                        <td colSpan={4} className="px-6 py-10 text-center text-sm text-slate-400">
                           No hay usuarios registrados.
                         </td>
                       </tr>
@@ -189,6 +235,9 @@ export const UsuariosPage = () => {
                         </td>
                         <td className="px-6 py-4 text-sm text-slate-500">
                           {u.email}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-slate-500">
+                          {u.role_nombre ?? 'Sin rol'}
                         </td>
                         <td className="px-6 py-4 text-sm text-slate-500">
                           <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold leading-5 ${

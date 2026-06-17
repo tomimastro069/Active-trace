@@ -5,7 +5,8 @@ from app.models.usuario import Usuario
 from app.repositories.usuario import UsuarioRepository
 from app.schemas.usuario import UsuarioCreate, UsuarioUpdate, UsuarioResponse
 from app.services.audit import AuditService
-from app.core.security import hash_password, generate_email_hash
+from sqlalchemy import func
+from app.core.security import generate_email_hash, hash_password
 
 class UsuarioService:
     def __init__(self, db: AsyncSession, tenant_id: UUID):
@@ -143,5 +144,39 @@ class UsuarioService:
     async def get_usuario(self, usuario_id: UUID) -> Optional[Usuario]:
         return await self.repo.get_by_id(usuario_id)
 
-    async def list_usuarios(self, skip: int = 0, limit: int = 100) -> List[Usuario]:
-        return await self.repo.list_all(skip=skip, limit=limit)
+    async def list_usuarios(self, skip: int = 0, limit: int = 100) -> List[UsuarioResponse]:
+        # Fetch users
+        users = await self.repo.list_all(skip=skip, limit=limit)
+        # Load role names for each user (first active assignment)
+        from sqlalchemy import select
+        from app.models.asignacion import Asignacion
+        from app.models.rol import Rol
+        result = []
+        for user in users:
+            # Try to get active assignment (current date within validity)
+            active_stmt = select(Asignacion.rol_id).where(
+                Asignacion.usuario_id == user.id,
+                Asignacion.desde <= func.now(),
+                (Asignacion.hasta == None) | (Asignacion.hasta >= func.now())
+            ).order_by(Asignacion.desde.desc()).limit(1)
+            active_row = await self.db.execute(active_stmt)
+            role_id = active_row.scalar_one_or_none()
+            role_name = None
+            if role_id:
+                role = await self.db.get(Rol, role_id)
+                role_name = role.nombre if role else None
+            # Fallback: most recent assignment regardless of dates
+            if not role_name:
+                fallback_stmt = select(Asignacion.rol_id).where(
+                    Asignacion.usuario_id == user.id
+                ).order_by(Asignacion.desde.desc()).limit(1)
+                fallback_row = await self.db.execute(fallback_stmt)
+                fallback_role_id = fallback_row.scalar_one_or_none()
+                if fallback_role_id:
+                    fallback_role = await self.db.get(Rol, fallback_role_id)
+                    role_name = fallback_role.nombre if fallback_role else None
+            # Convert to response, injecting role name
+            response = self.to_response(user, mask_pii=True)
+            response.role_nombre = role_name
+            result.append(response)
+        return result

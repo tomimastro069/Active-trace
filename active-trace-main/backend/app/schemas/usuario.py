@@ -81,7 +81,7 @@ class UsuarioResponse(BaseModel):
     legajo_profesional: Optional[str] = None
     facturador: bool
     modalidad_cobro: Optional[str] = None
-    created_at: datetime
+    role_nombre: Optional[str] = None
     updated_at: datetime
 
     model_config = ConfigDict(

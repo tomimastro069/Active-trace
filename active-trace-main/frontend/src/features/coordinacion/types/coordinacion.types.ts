@@ -151,6 +151,7 @@ export interface UsuarioSimple {
   nombre: string;
   apellidos: string;
   email: string;
+  role_nombre?: string | null;
 }
 
 export interface MateriaSimple {
