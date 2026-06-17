@@ -3,29 +3,30 @@
 # ---------- Builder Stage ----------
 FROM python:3.13-slim AS builder
 
-# Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Set work directory
 WORKDIR /app
 
-# Install pip and upgrade
 RUN python -m pip install --upgrade pip
 
-# Copy source code
-COPY . .
+COPY requirements.txt .
 
-# Install dependencies
-RUN pip install .
+# En lugar de instalar, descargamos y compilamos las dependencias en una carpeta
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
 
 # ---------- Runtime Stage ----------
 FROM python:3.13-slim AS runtime
 
-# Create non-root user
+# Instalar dependencias de ejecución del sistema si las necesitas (ej. libpq para PostgreSQL)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Crear usuario no-root
 ARG UID=1000
 ARG GID=1000
 RUN groupadd -g $GID appgroup && \
@@ -33,22 +34,24 @@ RUN groupadd -g $GID appgroup && \
 
 WORKDIR /app
 
-# Copy installed packages from builder
-COPY --from=builder /usr/local/lib/python3.13 /usr/local/lib/python3.13
-COPY --from=builder /usr/local/bin /usr/local/bin
+COPY requirements.txt .
 
-# Copy application source
-COPY --from=builder /app/app ./app
-COPY --from=builder /app/alembic ./alembic
-COPY --from=builder /app/alembic.ini ./alembic.ini
-COPY --from=builder /app/pyproject.toml ./pyproject.toml
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Ensure non-root execution
+# 2. Copiar el código de la aplicación (puedes hacerlo directo de tu contexto local)
+COPY ./app ./app
+COPY ./migrations ./migrations
+COPY ./core ./core
+COPY ./infra ./infra
+COPY ./monitoring ./monitoring
+COPY ./tenancy ./tenancy
+COPY ./alembic.ini ./alembic.ini
+COPY ./pyproject.toml ./pyproject.toml
+
+# Asegurar ejecución sin root
 USER appuser
 
-# Set environment variables
 ENV PYTHONPATH="/app"
 ENV PYTHONUNBUFFERED=1
 
-# Default command to run the API with uvicorn
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

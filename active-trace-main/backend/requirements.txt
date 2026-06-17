@@ -1,2 +1,18 @@
 # Observa: agrega las siguientes líneas si no existen
 prometheus_client>=0.17.1
+pydantic
+email-validator
+aiosmtplib
+uvicorn[standard]
+fastapi
+sqlalchemy
+pydantic-settings
+cryptography
+asyncpg
+alembic
+passlib[bcrypt]
+PyJWT
+python-jose[cryptography]
+httpx
+tenacity
+python-multipart
