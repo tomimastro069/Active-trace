@@ -4,6 +4,7 @@ import { AuthProvider } from '@/shared/contexts/AuthContext';
 import { AuthGuard } from '@/shared/components/AuthGuard';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { Layout } from '@/shared/components/Layout';
+import { DashboardPage } from '@/features/dashboard/pages/DashboardPage';
 import { ComisionDashboard } from '@/features/academico-docente/pages/ComisionDashboard';
 import { MonitorSeguimientoPage } from '@/features/academico-docente/pages/MonitorSeguimientoPage';
 import { EquiposPage } from '@/features/coordinacion/pages/EquiposPage';
@@ -12,12 +13,6 @@ import { TareasPage } from '@/features/coordinacion/pages/TareasPage';
 import { MonitorCoordinacionPage } from '@/features/coordinacion/pages/MonitorCoordinacionPage';
 import './index.css';
 
-const DashboardPlaceholder = () => (
-  <div className="p-8">
-    <h1 className="text-3xl font-bold">Dashboard (Protegido)</h1>
-    <p className="mt-4 text-gray-600">Bienvenido al sistema.</p>
-  </div>
-);
 
 const ComisionesListPlaceholder = () => (
   <div className="p-8">
@@ -46,7 +41,7 @@ function App() {
             {/* Rutas Privadas protegidas por AuthGuard y envueltas en Layout */}
             <Route element={<AuthGuard />}>
               <Route element={<Layout />}>
-                <Route path="/dashboard" element={<DashboardPlaceholder />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/comisiones" element={<ComisionesListPlaceholder />} />
                 <Route path="/comisiones/:materiaId/:cohorteId" element={<ComisionDashboard />} />
                 <Route path="/monitor-seguimiento" element={<MonitorSeguimientoPage />} />

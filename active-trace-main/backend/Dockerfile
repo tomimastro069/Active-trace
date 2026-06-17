@@ -47,6 +47,7 @@ COPY ./monitoring ./monitoring
 COPY ./tenancy ./tenancy
 COPY ./alembic.ini ./alembic.ini
 COPY ./pyproject.toml ./pyproject.toml
+COPY ./scripts ./scripts
 
 # Asegurar ejecución sin root
 USER appuser

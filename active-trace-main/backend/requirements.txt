@@ -11,6 +11,7 @@ cryptography
 asyncpg
 alembic
 passlib[bcrypt]
+argon2-cffi
 PyJWT
 python-jose[cryptography]
 httpx

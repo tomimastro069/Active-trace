@@ -12,6 +12,20 @@ services:
       - .env.example
     restart: "no"
 
+  seeder:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: active-trace-api:latest
+    command: [ "python", "scripts/seed_dev.py" ]
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+    env_file:
+      - .env.example
+    restart: "no"
+
+
   api:
     build:
       context: ./backend
@@ -20,7 +34,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      migrator:
+      seeder:
         condition: service_completed_successfully
     env_file:
       - .env.example
@@ -37,7 +51,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      migrator:
+      seeder:
         condition: service_completed_successfully
     env_file:
       - .env.example

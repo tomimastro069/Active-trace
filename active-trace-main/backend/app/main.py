@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.core.logging import setup_logging, TenantLoggingMiddleware
 from app.core.observability import setup_observability
 from app.core.tenancy import TenantMiddleware
@@ -50,6 +51,16 @@ app = FastAPI(
 app.add_middleware(PrometheusMiddleware)
 app.add_middleware(TenantLoggingMiddleware)
 app.add_middleware(TenantMiddleware)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Register routers
 app.include_router(health_router, prefix="/api/v1")
