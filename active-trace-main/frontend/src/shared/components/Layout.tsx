@@ -59,6 +59,14 @@ export const Layout = () => {
               </Link>
             </>
           )}
+
+          <div className="text-xs uppercase text-slate-500 font-semibold mb-2 mt-6">Mi Cuenta</div>
+          <Link to="/inbox" className="block px-4 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+            Mensajería
+          </Link>
+          <Link to="/perfil" className="block px-4 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+            Mi Perfil
+          </Link>
         </nav>
 
         <div className="p-4 border-t border-slate-800">
