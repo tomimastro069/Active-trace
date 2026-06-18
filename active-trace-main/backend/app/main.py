@@ -23,6 +23,7 @@ from app.api.v1.routers.avisos import router as avisos_router
 from app.api.v1.routers.perfil import router as perfil_router
 from app.api.v1.routers.inbox import router as inbox_router
 from app.api.v1.routers.alumno import router as alumno_router
+from app.api.v1.routers.programas import router as programas_router
 from app.core.database import engine
 
 # Monitoring
@@ -86,4 +87,5 @@ app.include_router(tareas_router, prefix="/api/v1/tareas")
 app.include_router(perfil_router, prefix="/api/v1")
 app.include_router(inbox_router, prefix="/api/v1")
 app.include_router(alumno_router, prefix="/api/v1")
+app.include_router(programas_router, prefix="/api/v1")
 app.include_router(auditoria_router, prefix="/api/v1/auditoria")
