@@ -151,6 +151,7 @@ export interface UsuarioSimple {
   nombre: string;
   apellidos: string;
   email: string;
+  estado: string;
   role_nombre?: string | null;
 }
 
