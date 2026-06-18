@@ -14,6 +14,8 @@ import { AvisosPage } from '@/features/coordinacion/pages/AvisosPage';
 import { TareasPage } from '@/features/coordinacion/pages/TareasPage';
 import { MonitorCoordinacionPage } from '@/features/coordinacion/pages/MonitorCoordinacionPage';
 import { UsuariosPage } from '@/features/coordinacion/pages/UsuariosPage';
+import { PerfilPage } from '@/features/perfil/pages/PerfilPage';
+import { InboxPage } from '@/features/mensajeria/pages/InboxPage';
 import './index.css';
 
 
@@ -47,6 +49,8 @@ function App() {
                 <Route path="/avisos" element={<AvisosPage />} />
                 <Route path="/tareas" element={<TareasPage />} />
                 <Route path="/monitor-coordinacion" element={<MonitorCoordinacionPage />} />
+                <Route path="/perfil" element={<PerfilPage />} />
+                <Route path="/inbox" element={<InboxPage />} />
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
               </Route>
             </Route>
