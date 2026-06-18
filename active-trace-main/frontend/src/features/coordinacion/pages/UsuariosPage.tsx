@@ -26,7 +26,7 @@ export const UsuariosPage = () => {
 
   // Mutación para la creación de usuario
   const crearUserMutation = useMutation({
-    mutationFn: (payload) => equiposService.crearUsuario(payload),
+    mutationFn: (payload: typeof nuevoUser) => equiposService.crearUsuario(payload),
     onSuccess: async (createdUser) => {
       // Assign selected role to the newly created user
       if (selectedRole) {
