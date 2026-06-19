@@ -31,6 +31,7 @@ from app.models.rol_permiso import RolPermiso
 from app.models.carrera import Carrera
 from app.models.cohorte import Cohorte
 from app.models.materia import Materia
+from app.models.aviso import Aviso, AlcanceEnum
 
 # ---------------------------------------------------------------------------
 # Datos
@@ -446,6 +447,48 @@ async def seed() -> None:
                             origen="Seed"
                         )
                         session.add(c)
+
+            # --- Seed de Avisos institucionales ---
+            print("\n--- Avisos ---")
+            from datetime import timedelta
+            avisos_demo = [
+                {
+                    "alcance": AlcanceEnum.GLOBAL,
+                    "severidad": "info",
+                    "titulo": "Bienvenidos al cuatrimestre 2026",
+                    "cuerpo": "Les damos la bienvenida al ciclo lectivo 2026. Recordá revisar los cronogramas de cada materia.",
+                    "inicio_en": datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=1),
+                    "fin_en": datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(days=30),
+                    "orden": 0,
+                    "activo": True,
+                    "requiere_ack": False,
+                },
+                {
+                    "alcance": AlcanceEnum.GLOBAL,
+                    "severidad": "warning",
+                    "titulo": "Mantenimiento programado este sábado",
+                    "cuerpo": "El sistema estará en mantenimiento el sábado de 02:00 a 06:00 hs. Guardá tu trabajo con anticipación.",
+                    "inicio_en": datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(hours=2),
+                    "fin_en": datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(days=7),
+                    "orden": 1,
+                    "activo": True,
+                    "requiere_ack": True,
+                },
+            ]
+            for av_data in avisos_demo:
+                existing = await session.execute(
+                    select(Aviso).where(
+                        Aviso.titulo == av_data["titulo"],
+                        Aviso.tenant_id == TENANT_ID
+                    )
+                )
+                if not existing.scalar_one_or_none():
+                    aviso = Aviso(tenant_id=TENANT_ID, **av_data)
+                    session.add(aviso)
+                    await session.flush()
+                    print(f"  [+] Aviso creado: {av_data['titulo']}")
+                else:
+                    print(f"  [~] Aviso ya existe: {av_data['titulo']}")
 
     print("\n=== Seed completado ===")
     print("Cuentas disponibles:")

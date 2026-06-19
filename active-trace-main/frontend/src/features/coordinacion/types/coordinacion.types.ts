@@ -52,7 +52,7 @@ export interface AsignacionVigenciaPayload {
 
 // --- Avisos (C-15) ---
 
-export type AlcanceAviso = 'Global' | 'PorMateria' | 'PorCohorte' | 'PorRol';
+export type AlcanceAviso = 'GLOBAL' | 'POR_MATERIA' | 'POR_COHORTE' | 'POR_ROL';
 
 export interface Aviso {
   id: string;

@@ -5,10 +5,10 @@ from .base import Base, TimestampedTenant
 
 
 class AlcanceEnum(str, Enum):
-    GLOBAL = "Global"
-    POR_MATERIA = "PorMateria"
-    POR_COHORTE = "PorCohorte"
-    POR_ROL = "PorRol"
+    GLOBAL = "GLOBAL"
+    POR_MATERIA = "POR_MATERIA"
+    POR_COHORTE = "POR_COHORTE"
+    POR_ROL = "POR_ROL"
 
 
 class Aviso(TimestampedTenant, Base):

@@ -35,7 +35,7 @@ async def test_crear_y_obtener_avisos(db_session):
                     app.dependency_overrides[get_current_user] = override_docente
                     
                     payload = {
-                        "alcance": "Global",
+                        "alcance": "GLOBAL",
                         "titulo": "Aviso Integracion",
                         "cuerpo": "Prueba",
                         "severidad": "INFO",

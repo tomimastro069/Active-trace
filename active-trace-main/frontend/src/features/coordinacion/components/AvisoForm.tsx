@@ -3,11 +3,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { avisosService } from '../services/avisos.service';
 import type { AlcanceAviso, AvisoCreatePayload } from '../types/coordinacion.types';
 
-const ALCANCES: AlcanceAviso[] = ['Global', 'PorMateria', 'PorCohorte', 'PorRol'];
+const ALCANCES: AlcanceAviso[] = ['GLOBAL', 'POR_MATERIA', 'POR_COHORTE', 'POR_ROL'];
 const SEVERIDADES = ['info', 'warning', 'critical'];
 
 const emptyAviso: AvisoCreatePayload = {
-  alcance: 'Global',
+  alcance: 'GLOBAL',
   severidad: 'info',
   titulo: '',
   cuerpo: '',
@@ -75,17 +75,17 @@ export const AvisoForm = () => {
           </label>
         </div>
 
-        {form.alcance === 'PorMateria' && (
+        {form.alcance === 'POR_MATERIA' && (
           <input required placeholder="ID de la Materia" value={form.materia_id ?? ''}
             onChange={(e) => setForm({ ...form, materia_id: e.target.value })}
             className="w-full rounded border border-slate-300 px-3 py-2 text-sm" />
         )}
-        {form.alcance === 'PorCohorte' && (
+        {form.alcance === 'POR_COHORTE' && (
           <input required placeholder="ID de la Cohorte" value={form.cohorte_id ?? ''}
             onChange={(e) => setForm({ ...form, cohorte_id: e.target.value })}
             className="w-full rounded border border-slate-300 px-3 py-2 text-sm" />
         )}
-        {form.alcance === 'PorRol' && (
+        {form.alcance === 'POR_ROL' && (
           <input required placeholder="Rol destino (ej. PROFESOR)" value={form.rol_destino ?? ''}
             onChange={(e) => setForm({ ...form, rol_destino: e.target.value })}
             className="w-full rounded border border-slate-300 px-3 py-2 text-sm" />
