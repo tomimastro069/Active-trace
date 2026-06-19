@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { StatCard } from '../components/StatCard';
+import { AlumnoDashboardPage } from './AlumnoDashboardPage';
 
 const DocenteDashboard = () => (
   <div className="space-y-8 animate-in fade-in duration-500">
@@ -222,9 +223,10 @@ export const DashboardPage: React.FC = () => {
   const isAdmin = roles.includes('ADMIN');
   const isCoordinador = roles.includes('COORDINADOR');
   const isDocente = roles.includes('PROFESOR');
+  const isAlumno = roles.includes('ALUMNO');
   
-  // Fallback a Docente si no tiene rol o tiene un rol raro
-  const showDocente = isDocente || (!isAdmin && !isCoordinador);
+  // Fallback a Docente si no tiene rol o tiene un rol raro y no es alumno
+  const showDocente = isDocente || (!isAdmin && !isCoordinador && !isAlumno);
 
   return (
     <div className="max-w-7xl mx-auto p-8 space-y-8">
@@ -240,7 +242,8 @@ export const DashboardPage: React.FC = () => {
 
       {isAdmin && <AdminDashboard />}
       {!isAdmin && isCoordinador && <CoordinadorDashboard />}
-      {!isAdmin && !isCoordinador && showDocente && <DocenteDashboard />}
+      {!isAdmin && !isCoordinador && !isAlumno && showDocente && <DocenteDashboard />}
+      {isAlumno && <AlumnoDashboardPage />}
     </div>
   );
 };

@@ -42,6 +42,9 @@ class AsignacionService:
                 raise ValueError("El responsable asignado no existe o pertenece a otro tenant.")
 
         # 5. Crear la asignación
+        def _naive(dt: datetime | None) -> datetime | None:
+            return dt.replace(tzinfo=None) if dt is not None else None
+
         asig = Asignacion(
             usuario_id=schema.usuario_id,
             rol_id=schema.rol_id,
@@ -50,8 +53,8 @@ class AsignacionService:
             cohorte_id=schema.cohorte_id,
             comisiones=schema.comisiones,
             responsable_id=schema.responsable_id,
-            desde=schema.desde,
-            hasta=schema.hasta
+            desde=_naive(schema.desde),
+            hasta=_naive(schema.hasta)
         )
 
         asig = await self.repo.create(asig)
@@ -104,12 +107,12 @@ class AsignacionService:
         if schema.desde is not None and schema.desde != asig.desde:
             detalle_cambio["desde_antiguo"] = asig.desde.isoformat()
             detalle_cambio["desde_nuevo"] = schema.desde.isoformat()
-            asig.desde = schema.desde
+            asig.desde = schema.desde.replace(tzinfo=None)
 
         if schema.hasta is not None and schema.hasta != asig.hasta:
             detalle_cambio["hasta_antiguo"] = asig.hasta.isoformat() if asig.hasta else None
             detalle_cambio["hasta_nuevo"] = schema.hasta.isoformat() if schema.hasta else None
-            asig.hasta = schema.hasta
+            asig.hasta = schema.hasta.replace(tzinfo=None)
 
         # Contexto
         for field in ["materia_id", "carrera_id", "cohorte_id", "comisiones"]:
